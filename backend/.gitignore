@@ -1,0 +1,32 @@
+# ── Python ────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# ── Virtual environments ───────────────────────────────────
+venv/
+.venv/
+env/
+
+# ── Secrets – NEVER commit these ──────────────────────────
+.env
+*.env
+!.env.example
+
+# ── YOLO model weights ─────────────────────────────────────
+*.pt
+*.onnx
+*.engine
+runs/
+
+# ── Misc ───────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+*.log
+*.tmp

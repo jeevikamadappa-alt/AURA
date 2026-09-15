@@ -1,0 +1,20 @@
+# AURA Backend – Python Dependencies
+
+# Web framework
+flask>=3.0.0
+flask-cors>=4.0.0
+
+# Environment variable loading (dev only – use real env vars in production)
+python-dotenv>=1.0.0
+
+# HTTP client (Roboflow API calls)
+requests>=2.31.0
+
+# Image handling
+Pillow>=10.0.0
+
+# YOLO object detection
+ultralytics>=8.3.0
+
+# Gunicorn for production serving
+gunicorn>=21.2.0

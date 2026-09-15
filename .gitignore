@@ -1,0 +1,53 @@
+﻿# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Virtual environments
+venv/
+.venv/
+env/
+backend/venv/
+backend/.venv/
+
+# Secrets - NEVER commit these
+.env
+*.env
+backend/.env
+!backend/.env.example
+
+# YOLO model weights (large binary files)
+*.pt
+*.onnx
+*.engine
+*.weights
+runs/
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs and temp
+*.log
+*.tmp
+*.bak
+*.cache
+
+# Python cache
+backend/detection/__pycache__/
+backend/priority/__pycache__/
+backend/__pycache__/
