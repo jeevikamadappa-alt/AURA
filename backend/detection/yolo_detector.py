@@ -43,7 +43,32 @@ def _load_model():
 
     try:
         from ultralytics import YOLO
-        model_path = Path(YOLO_MODEL_PATH)
+
+        # Resolve model path relative to the backend directory so it works
+        # regardless of which directory the server was launched from.
+        # Search order: (1) path as-is, (2) next to yolo_detector.py, (3) backend root
+        _backend_dir = Path(__file__).resolve().parent.parent  # detection/ -> backend/
+        candidate_paths = [
+            Path(YOLO_MODEL_PATH),                              # As configured
+            _backend_dir / YOLO_MODEL_PATH,                    # backend/yolo11n.pt
+            _backend_dir / Path(YOLO_MODEL_PATH).name,         # backend/<filename>
+            Path(__file__).resolve().parent / YOLO_MODEL_PATH, # detection/<filename>
+        ]
+
+        model_path = None
+        for p in candidate_paths:
+            if p.exists():
+                model_path = p
+                break
+
+        if model_path is None:
+            searched = ", ".join(str(p) for p in candidate_paths)
+            raise FileNotFoundError(
+                f"YOLO model file not found. Searched: [{searched}]. "
+                f"After cloning the repo, download yolo11n.pt and place it in the "
+                f"'backend/' folder, or set YOLO_MODEL_PATH in your .env file."
+            )
+
         logger.info("Loading YOLO model from: %s", model_path)
         _yolo_model = YOLO(str(model_path))
         logger.info(
@@ -54,7 +79,10 @@ def _load_model():
         return _yolo_model
 
     except ImportError:
-        logger.error("ultralytics package is not installed.")
+        logger.error("ultralytics package is not installed. Run: pip install ultralytics")
+        raise
+    except FileNotFoundError as exc:
+        logger.error("YOLO model not found: %s", exc)
         raise
     except Exception as exc:
         logger.error("Failed to load YOLO model: %s", exc)

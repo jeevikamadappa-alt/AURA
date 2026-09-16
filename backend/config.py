@@ -3,10 +3,28 @@ AURA Backend – Configuration
 All secrets are read from environment variables.
 Never hard-code or log any API key.
 """
+import logging
 import os
+from pathlib import Path
+
 from dotenv import load_dotenv
 
-load_dotenv()  # loads .env when present (dev only)
+# ── Load .env relative to this file so it works from any launch directory ─────
+# This means `python app.py` from the repo root, `backend/`, or anywhere else
+# will all find backend/.env correctly.
+_env_path = Path(__file__).resolve().parent / ".env"
+load_dotenv(_env_path)  # loads backend/.env regardless of CWD
+
+_log = logging.getLogger(__name__)
+
+
+def _mask(key: str) -> str:
+    """Return a safely-masked API key for logging (never logs the real value)."""
+    if not key:
+        return "<NOT SET>"
+    if len(key) < 8:
+        return "***"
+    return key[:4] + "..." + key[-4:]
 
 
 # ──────────────────────────────────────────────
@@ -82,7 +100,30 @@ YOLO_CONFIDENCE_THRESHOLD: float = float(
 ACCIDENT_VEHICLE_CLASSES: set = {"car", "truck", "bus", "motorcycle"}
 
 # ──────────────────────────────────────────────
+# Flask / Security
+# ──────────────────────────────────────────────
+SECRET_KEY: str = os.environ.get("SECRET_KEY", "change_me_in_production")
+
+# ──────────────────────────────────────────────
 # File upload
 # ──────────────────────────────────────────────
 MAX_CONTENT_LENGTH: int = 16 * 1024 * 1024  # 16 MB
 ALLOWED_EXTENSIONS: set = {"jpg", "jpeg", "png", "webp", "bmp"}
+
+# ──────────────────────────────────────────────
+# Startup diagnostics – log masked key values
+# ──────────────────────────────────────────────
+# These run at import time so every server startup prints key status.
+# Values are MASKED – only the first/last 4 chars are shown, never the real key.
+_log.info("── AURA config loaded ──────────────────────────────────────────────────")
+_log.info("  .env path resolved to : %s (exists=%s)", _env_path, _env_path.exists())
+_log.info("  ROBOFLOW_API_KEY       : %s", _mask(ROBOFLOW_API_KEY))
+_log.info("  YOLO_MODEL_PATH        : %s", YOLO_MODEL_PATH)
+_log.info("  YOLO_CONFIDENCE        : %s", YOLO_CONFIDENCE_THRESHOLD)
+_log.info("  FLASK_ENV              : %s", os.environ.get("FLASK_ENV", "<not set>"))
+if not ROBOFLOW_API_KEY:
+    _log.warning(
+        "ROBOFLOW_API_KEY is empty! Roboflow models will be SKIPPED. "
+        "Copy backend/.env.example to backend/.env and fill in your key."
+    )
+_log.info("────────────────────────────────────────────────────────────────────────")

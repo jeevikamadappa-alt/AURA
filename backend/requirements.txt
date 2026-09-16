@@ -16,5 +16,10 @@ Pillow>=10.0.0
 # YOLO object detection
 ultralytics>=8.3.0
 
+# CLIP semantic classifier (PRIMARY detector for flood/drainage/pipeline)
+# open-clip-torch provides the open_clip module used in detection/clip_classifier.py
+open-clip-torch>=2.24.0
+torch>=2.0.0
+
 # Gunicorn for production serving
 gunicorn>=21.2.0
